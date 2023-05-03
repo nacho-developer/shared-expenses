@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.nacho
+testFramework: junit
+sourceLanguage: kotlin
+buildTool: maven
+features: [annotation-api, app-name, data, data-jpa, http-client, jackson-databind, jdbc-hikari, junit, kotlin, kotlin-application, logback, maven, mockito, openapi, postgres, readme, shade, swagger-ui, test-resources, tomcat-server, yaml]
