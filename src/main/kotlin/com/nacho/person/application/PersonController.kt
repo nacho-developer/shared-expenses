@@ -11,7 +11,7 @@ import com.nacho.person.domain.PersonDto
 import com.nacho.person.domain.PersonRequest
 
 @ExecuteOn(TaskExecutors.IO)
-@Controller("/persons")
+@Controller("/api/v1/persons")
 class PersonController(private val personService: PersonService) {
 
     @Get

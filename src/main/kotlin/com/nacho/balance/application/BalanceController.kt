@@ -13,7 +13,7 @@ import com.nacho.balance.domain.Debt
 import java.math.BigDecimal
 
 @ExecuteOn(TaskExecutors.IO)
-@Controller("/balance")
+@Controller("/api/v1/balance")
 class BalanceController(private val balanceService: BalanceService) {
 
     @Get

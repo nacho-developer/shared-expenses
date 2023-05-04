@@ -13,7 +13,7 @@ import io.micronaut.scheduling.TaskExecutors
 import com.nacho.expense.domain.ExpenseDto
 
 @ExecuteOn(TaskExecutors.IO)
-@Controller("/expenses")
+@Controller("/api/v1/expenses")
 class ExpenseController(private val expenseService: ExpenseService) {
 
 	@Get
