@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.nacho</groupId>
   <artifactId>shared-expenses</artifactId>
-  <version>0.1</version>
+  <version>1.0</version>
   <packaging>${packaging}</packaging>
 
   <parent>
@@ -76,13 +76,11 @@
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-reflect</artifactId>
-      <version>${kotlinVersion}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-stdlib-jdk8</artifactId>
-      <version>${kotlinVersion}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
