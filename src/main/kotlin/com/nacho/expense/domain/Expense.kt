@@ -30,5 +30,5 @@ class Expense(
         joinColumns = [JoinColumn(name = "expense_id")],
         inverseJoinColumns = [JoinColumn(name = "person_id")]
     )
-    val deodors: List<Person>
+    var deodors: List<Person>
 )

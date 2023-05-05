@@ -11,6 +11,10 @@ import com.nacho.expense.domain.ExpenseRequest
 import io.micronaut.scheduling.annotation.ExecuteOn
 import io.micronaut.scheduling.TaskExecutors
 import com.nacho.expense.domain.ExpenseDto
+import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.Delete
+import com.nacho.expense.domain.DeodorExpenseRequest
+import com.nacho.expense.domain.CancelExpenseRequest
 
 @ExecuteOn(TaskExecutors.IO)
 @Controller("/api/v1/expenses")
@@ -24,5 +28,15 @@ class ExpenseController(private val expenseService: ExpenseService) {
 	@Put
 	fun createExpense(@Body expenseRequest: ExpenseRequest): ExpenseDto {
 		return expenseService.createExpense(expenseRequest)
+	}
+
+	@Post
+	fun addDeodorExpense(@Body deodorExpenseRequest: DeodorExpenseRequest): ExpenseDto {
+		return expenseService.addDeodorExpense(deodorExpenseRequest)
+	}
+
+	@Delete
+	fun cancelExpense(@Body cancelExpenseRequest: CancelExpenseRequest) {
+		return expenseService.cancelExpense(cancelExpenseRequest)
 	}
 }
