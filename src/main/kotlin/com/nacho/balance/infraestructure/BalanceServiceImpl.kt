@@ -1,7 +1,6 @@
 package com.nacho.balance.infraestructure
 
 import jakarta.inject.Singleton
-import javax.transaction.Transactional
 import io.micronaut.transaction.annotation.ReadOnly
 
 import java.math.BigDecimal
@@ -14,7 +13,6 @@ import com.nacho.person.domain.Person
 import com.nacho.balance.domain.Debt
 
 @Singleton
-@Transactional
 open class BalanceServiceImpl(
 	private val personRepository: PersonRepository,
 	private val expenseRepository: ExpenseRepository
@@ -48,47 +46,27 @@ open class BalanceServiceImpl(
 		return balanceMap
 	}
 
-
 	@ReadOnly
 	override fun getGroupBalanceAccurate(): List<Debt> {
 		val expenses = expenseRepository.findAll()
-		val balanceMap = mutableMapOf<String, BigDecimal>()
-		expenses.groupBy { it.payer.id }
-			.mapValues { (_, expenses) -> expenses.map { it.amount }.fold(BigDecimal.ZERO) { acc, curr -> acc + curr } }
-			.forEach { (personId, totalSpent) ->
-				val personName = personRepository.findById(personId).get().name
-				balanceMap[personName] = totalSpent
+		val debts = mutableMapOf<Pair<String, String>, BigDecimal>()
+		expenses.forEach { expense ->
+			val payer = expense.payer
+			val totalAmount = expense.amount
+			val numDeodors = expense.deodors.size
+			val amountPerPerson = totalAmount.divide(numDeodors.toBigDecimal(), 2, RoundingMode.HALF_UP) // fixed line
+			expense.deodors.forEach { deodor ->
+				val debtKey = Pair(payer.name, deodor.name)
+				val previousAmount = debts.getOrDefault(debtKey, BigDecimal.ZERO)
+				debts[debtKey] = previousAmount.add(amountPerPerson)
 			}
-
-		val debts = mutableListOf<Debt>()
-		balanceMap.forEach { (from, fromBalance) ->
-			balanceMap.filter { it.key != from }
-				.forEach { (to, toBalance) ->
-					val debtAmount = fromBalance.minus(toBalance).abs().setScale(2, RoundingMode.HALF_EVEN)
-					if (debtAmount > BigDecimal.ZERO) {
-						debts.add(Debt(from, to, debtAmount))
-					}
-				}
 		}
-		debts.sortByDescending { it.amount }
-
-		val transactions = mutableListOf<Debt>()
-		while (debts.isNotEmpty()) {
-			val debt = debts.first()
-			val from = balanceMap[debt.from]!!
-			val to = balanceMap[debt.to]!!
-			if (from >= debt.amount && to >= debt.amount) {
-				balanceMap[debt.from] = from.minus(debt.amount)
-				balanceMap[debt.to] = to.plus(debt.amount)
-				transactions.add(debt)
-				debts.remove(debt)
+		return debts.map { (debtKey, amount) ->
+			if (amount >= BigDecimal.ZERO) {
+				Debt(debtKey.first, debtKey.second, amount.setScale(2, RoundingMode.HALF_UP)) // fixed line
 			} else {
-				debts.remove(debt)
-				debts.add(Debt(debt.from, debt.to, debt.amount.minus(from)))
-				debts.add(Debt(debt.to, debt.from, debt.amount.minus(to)))
+				Debt(debtKey.second, debtKey.first, amount.negate().setScale(2, RoundingMode.HALF_UP)) // fixed line
 			}
 		}
-		return transactions
 	}
-
 }
