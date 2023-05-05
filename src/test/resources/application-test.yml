@@ -1,6 +1,20 @@
+datasources:
+  default:
+    driver-class-name: org.postgresql.Driver
+    db-type: postgres
+    dialect: POSTGRES
 jpa:
   default:
+    entity-scan:
+      packages:
+        - 'com.nacho.expense.domain' 
+        - 'com.nacho.expense.infraestructure' 
+        - 'com.nacho.person.domain' 
+        - 'com.nacho.person.infraestructure' 
     properties:
       hibernate:
+        show-sql: true
         hbm2ddl:
-          auto: create-drop
+          auto: update
+        connection:
+          db-type: postgres
