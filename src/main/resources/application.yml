@@ -1,6 +1,6 @@
 micronaut:
   server:
-    port: 8085
+    port: 8080
     cors:
       enabled: true
       allow-origin: "*"
