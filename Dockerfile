@@ -1,27 +1,21 @@
-FROM adoptopenjdk:11-jre-hotspot
+FROM adoptopenjdk/openjdk17:alpine-jre
 
+# Instalar Maven
+RUN apk add --no-cache curl tar \
+    && curl -L https://downloads.apache.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz \
+    | tar -xz -C /usr/share \
+    && mv /usr/share/apache-maven-3.8.4 /usr/share/maven \
+    && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+
+# Copiar archivos de la aplicación
+COPY . /app
 WORKDIR /app
 
-COPY build/libs/my-app-*.jar app.jar
+# Construir aplicación con Maven
+RUN mvn clean package
 
-# Instalar PostgreSQL
-RUN apt-get update && \
-    apt-get install -y postgresql && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Copiar el archivo de configuración de la base de datos
-COPY src/main/resources/application.yml .
-
-# Agregar el usuario y la base de datos de PostgreSQL
-USER postgres
-RUN /etc/init.d/postgresql start && \
-    psql --command "CREATE USER myuser WITH SUPERUSER PASSWORD 'mypassword';" && \
-    createdb -O myuser mydb
-
-# Exponer el puerto 8080 para la aplicación Micronaut
+# Exponer puerto de la aplicación
 EXPOSE 8080
 
-# Cambiar al usuario "root" y ejecutar la aplicación
-USER root
-ENTRYPOINT ["java","-jar","app.jar"]
+# Ejecutar aplicación
+CMD ["java", "-jar", "/app/target/shared-expenses.jar"]
